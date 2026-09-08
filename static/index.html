@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FlowOps</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet" />
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+      :root { --ink:#171717; --muted:#77736c; --line:#e5e2dc; --paper:#fbfaf8; --accent:#d7ff4f; --blue:#5b63d9; --serif:"Libre Baskerville", Georgia, serif; --sans:"DM Sans", Arial, sans-serif; --mono:"DM Mono", monospace; }
+      * { box-sizing:border-box; }
+      body { margin:0; color:var(--ink); background:var(--paper); font-family:var(--sans); }
+      body:before { content:""; position:fixed; inset:0; pointer-events:none; opacity:.22; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E"); }
+      button, input { font:inherit; }
+      button { cursor:pointer; }
+      .shell { max-width:1480px; margin:auto; padding:0 42px 70px; }
+      .topbar { height:76px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--line); }
+      .brand { display:flex; gap:12px; align-items:center; color:var(--ink); text-decoration:none; font-weight:700; letter-spacing:-.04em; font-size:20px; }
+      .mark { width:34px; height:34px; display:block; }
+      .nav { display:flex; align-items:center; gap:22px; color:var(--muted); font-size:13px; }
+      .nav .nav-active { color:var(--ink); font-weight:700; }
+      .nav a { color:inherit; text-decoration:none; }
+      .nav a:hover { color:var(--ink); }
+      .hero { display:grid; grid-template-columns:1.15fr .85fr; gap:48px; padding:68px 0 58px; border-bottom:1px solid var(--line); }
+      .eyebrow { color:var(--muted); font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; }
+      h1 { max-width:750px; margin:18px 0 22px; font-family:var(--serif); font-size:clamp(42px, 6vw, 82px); font-weight:400; letter-spacing:-.075em; line-height:1.02; }
+      .hero p { max-width:540px; color:var(--muted); font-size:17px; line-height:1.65; }
+      .scribble { display:block; width:190px; height:22px; margin-top:28px; }
+      .hero-aside { align-self:end; padding:22px 0 0 28px; border-left:1px solid var(--line); }
+      .hero-aside strong { display:block; margin:8px 0 12px; font-family:var(--serif); font-size:25px; font-weight:400; }
+      .hero-aside p { margin:0; font-size:13px; line-height:1.6; }
+      .workspace { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr); gap:20px; padding-top:28px; }
+      .panel { border:1px solid var(--line); background:rgba(255,255,255,.62); border-radius:18px; overflow:hidden; }
+      .panel-head { display:flex; justify-content:space-between; align-items:flex-start; padding:24px 26px 20px; border-bottom:1px solid var(--line); }
+      .panel-title { margin:0; font-family:var(--serif); font-size:22px; font-weight:400; letter-spacing:-.04em; }
+      .panel-note { color:var(--muted); font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.08em; }
+      .form { padding:26px; }
+      label { display:block; margin-bottom:9px; font-family:var(--mono); font-size:10px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; }
+      textarea { width:100%; min-height:120px; resize:vertical; padding:16px; border:1px solid #c9c6bd; border-radius:12px; color:var(--ink); background:#fff; font:14px/1.6 var(--sans); outline:none; }
+      textarea:focus { border-color:var(--ink); box-shadow:3px 3px 0 var(--accent); }
+      .form-foot { display:flex; justify-content:space-between; align-items:center; gap:18px; margin-top:18px; }
+      .hint { color:var(--muted); font-size:12px; line-height:1.45; }
+      .run { display:flex; align-items:center; gap:12px; padding:13px 18px; border:1px solid var(--ink); border-radius:9px; color:var(--ink); background:var(--accent); font-weight:700; font-size:13px; }
+      .run:hover { background:var(--ink); color:white; }
+      .run:disabled { cursor:wait; opacity:.6; }
+      .message { margin:18px 0 0; color:var(--muted); font-size:12px; }
+      .message.error { color:#a33c2c; }
+      .metric-grid { display:grid; grid-template-columns:1fr 1fr; }
+      .metric { padding:22px 26px; border-bottom:1px solid var(--line); }
+      .metric:nth-child(odd) { border-right:1px solid var(--line); }
+      .metric:nth-last-child(-n+2) { border-bottom:0; }
+      .metric b { display:block; font-family:var(--serif); font-size:31px; font-weight:400; letter-spacing:-.06em; }
+      .metric span { color:var(--muted); font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.06em; }
+      .runs { margin-top:20px; }
+      .run-toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:0 26px 20px; }
+      .filter { padding:8px 12px; border:1px solid var(--line); border-radius:99px; color:var(--muted); background:transparent; font:10px var(--mono); text-transform:uppercase; letter-spacing:.04em; }
+      .filter.active, .filter:hover { color:var(--ink); border-color:var(--ink); background:#fff; }
+      .run-grid { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:12px; padding:0 26px 26px; }
+      .run-card { min-height:175px; padding:18px; border:1px solid var(--line); border-radius:14px; background:#fff; transition:transform .18s, box-shadow .18s; }
+      .run-card:hover { transform:translateY(-3px); box-shadow:0 10px 24px rgba(23,23,23,.08); }
+      .run-card-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+      .run-card .run-name { margin-bottom:7px; }
+      .run-card .run-id { margin-bottom:18px; }
+      .stage { display:flex; align-items:center; gap:8px; margin-top:auto; color:var(--muted); font:10px var(--mono); text-transform:uppercase; }
+      .stage-line { flex:1; height:5px; border-radius:99px; background:var(--line); overflow:hidden; }
+      .stage-line i { display:block; height:100%; background:var(--blue); border-radius:inherit; }
+      .run-time { display:block; margin-top:14px; color:var(--muted); font:10px var(--mono); }
+      .run-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:500; }
+      .run-id, .run-time { color:var(--muted); font:10px var(--mono); }
+      .pill { justify-self:start; padding:5px 8px; background:#ecebe5; font:10px var(--mono); text-transform:uppercase; }
+      .pill.succeeded { background:var(--accent); }
+      .empty { padding:28px 26px; color:var(--muted); font-size:13px; }
+      .footer { display:flex; justify-content:space-between; padding-top:34px; color:var(--muted); font:10px var(--mono); text-transform:uppercase; letter-spacing:.08em; }
+      .field-row { display:grid; grid-template-columns:1fr 2fr; gap:12px; margin-bottom:18px; }
+      .field { width:100%; padding:13px 14px; border:1px solid #c9c6bd; border-radius:10px; color:var(--ink); background:#fff; outline:none; }
+      .field:focus { border-color:var(--ink); box-shadow:3px 3px 0 var(--accent); }
+      .detail-backdrop { position:fixed; inset:0; z-index:5; display:grid; place-items:center; padding:24px; background:rgba(23,23,23,.28); }
+      .detail { width:min(680px,100%); max-height:90vh; overflow:auto; border:1px solid var(--line); border-radius:18px; background:var(--paper); box-shadow:0 24px 80px rgba(23,23,23,.2); }
+      .detail-head { display:flex; justify-content:space-between; gap:20px; padding:24px 26px; border-bottom:1px solid var(--line); }
+      .btn-delete { padding:6px 12px; border:1px solid #d9534f; border-radius:6px; color:#d9534f; background:transparent; font:11px var(--mono); text-transform:uppercase; cursor:pointer; }
+      .btn-delete:hover { background:#d9534f; color:#fff; }
+      .close { border:0; background:transparent; color:var(--muted); font-size:22px; }
+      .detail-body { padding:26px; }
+      .detail-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:18px 0; }
+      .detail-stat { padding:14px; border:1px solid var(--line); border-radius:10px; background:#fff; }
+      .detail-stat b { display:block; font-family:var(--serif); font-size:24px; font-weight:400; }
+      .detail-stat span { color:var(--muted); font:10px var(--mono); text-transform:uppercase; }
+      pre { padding:16px; overflow:auto; border-radius:10px; background:#171717; color:#f8f7f3; font:11px/1.5 var(--mono); }
+      @media (max-width:1000px) { .run-grid{grid-template-columns:repeat(2, minmax(0, 1fr));} }
+      @media (max-width:800px) { .shell{padding:0 20px 50px}.nav{gap:12px}.nav a{display:none}.hero{grid-template-columns:1fr;padding:54px 0}.hero-aside{padding:20px 0 0;border-left:0;border-top:1px solid var(--line)}.workspace{grid-template-columns:1fr}.field-row{grid-template-columns:1fr}.form-foot{align-items:flex-start;flex-direction:column}.run{width:100%;justify-content:center}.run-grid{grid-template-columns:1fr;padding:0 18px 18px}.run-toolbar{padding:0 18px 18px}.panel-head{padding-left:18px;padding-right:18px}.detail-grid{grid-template-columns:1fr 1fr} }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useEffect, useState } = React;
+      const Logo = () => <svg className="mark" viewBox="0 0 40 40" aria-label="FlowOps logo" role="img">
+        <path d="M20 4.5c8.6 0 15.5 6.9 15.5 15.5S28.6 35.5 20 35.5 4.5 28.6 4.5 20 11.4 4.5 20 4.5Z" fill="none" stroke="currentColor" strokeWidth="2"/>
+        <path d="M20 4.5c-3.7 4.9-5.5 10-5.5 15.5S16.3 30.6 20 35.5M20 4.5c3.7 4.9 5.5 10 5.5 15.5S23.7 30.6 20 35.5M5.2 20h29.6" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+        <circle cx="20" cy="20" r="3.5" fill="var(--accent)" stroke="currentColor" strokeWidth="2"/>
+      </svg>;
+      const Scribble = () => <svg className="scribble" viewBox="0 0 190 22" aria-hidden="true"><path d="M2 13c15-7 21 5 34-1 14-7 20-2 31-4 15-3 22 5 36 0 16-6 21 3 34 0 15-4 24-4 34 1 5 2 10 1 17-3" fill="none" stroke="#11110f" strokeWidth="2" strokeLinecap="round"/></svg>;
+      const formatDate = value => new Date(value).toLocaleString([], {month:"short", day:"numeric", hour:"numeric", minute:"2-digit"});
+      const stages = ["ingestion", "transformation", "validation", "evaluation"];
+      function App() {
+        const [runs, setRuns] = useState([]);
+        const [name, setName] = useState("");
+        const [text, setText] = useState("");
+        const [message, setMessage] = useState("");
+        const [busy, setBusy] = useState(false);
+        const [filter, setFilter] = useState("all");
+        const [selected, setSelected] = useState(null);
+        const refresh = () => fetch("/pipelines").then(r => r.json()).then(setRuns).catch(() => setMessage("Could not load recent runs."));
+        useEffect(() => { refresh(); const timer = setInterval(refresh, 3000); return () => clearInterval(timer); }, []);
+        const submit = async event => {
+          event.preventDefault(); setBusy(true); setMessage("");
+          try {
+            const response = await fetch("/pipelines/run", {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({ name: name.trim() || "Untitled run", source: "inline", text })
+            });
+            if (!response.ok) {
+              const error = await response.json().catch(() => ({}));
+              throw new Error(error.detail || "Unable to start run");
+            }
+            setName(""); setText(""); setMessage("Run started. Follow its progress below."); refresh();
+          }
+          catch (error) { setMessage(error.message || "Unable to start this run."); }
+          finally { setBusy(false); }
+        };
+        const openRun = async id => {
+          const response = await fetch("/pipelines/" + id);
+          if (response.ok) setSelected(await response.json());
+        };
+        const deleteRun = async id => {
+          try {
+            const response = await fetch("/pipelines/" + id, { method: "DELETE" });
+            if (response.ok) {
+              setSelected(null);
+              refresh();
+            }
+          } catch (err) {
+            console.error(err);
+          }
+        };
+        const completed = runs.filter(r => r.status === "succeeded").length;
+        const failed = runs.filter(r => r.status === "failed").length;
+        const active = runs.filter(r => r.status === "queued" || r.status === "running").length;
+        const visibleRuns = [...runs].reverse().filter(run => filter === "all" || run.status === filter);
+        const stageProgress = run => run.status === "succeeded" ? 100 : Math.max(0, Math.min(100, run.progress || 0));
+        const stageName = run => run.status === "queued" ? "Queued" : (run.current_stage || "Starting");
+        return <div className="shell">
+          <header className="topbar"><a className="brand" href="/"><Logo/><span>FlowOps</span></a><nav className="nav"><a className="nav-active" href="#runs">Workspace</a><a href="#runs">Runs</a></nav></header>
+          <section className="hero"><div><div className="eyebrow">FlowOps workspace</div><h1>Turn raw data into decisions.</h1><p>A focused place to run, inspect, and understand your data pipelines. Start with your own CSV and get a transparent result.</p><Scribble/></div><aside className="hero-aside"><div className="eyebrow">Ready when you are</div><strong>Your first run starts here.</strong><p>Paste a CSV dataset, name the run, and FlowOps will execute every stage with live progress and a clear result.</p></aside></section>
+          <main className="workspace"><section className="panel"><div className="panel-head"><h2 className="panel-title">Start a new run</h2><span className="panel-note">Your data only</span></div><form className="form" onSubmit={submit}><div><label htmlFor="name">Run name</label><input className="field" id="name" placeholder="e.g. April sales quality" value={name} onChange={e=>setName(e.target.value)} /></div><label htmlFor="dataset">Paste your CSV dataset</label><textarea id="dataset" placeholder={"id,value\\norder-001,42\\norder-002,18"} value={text} onChange={e=>setText(e.target.value)} required/><div className="form-foot"><span className="hint">CSV in, validated results out.<br/>Nothing runs until you click start.</span><button className="run" disabled={busy}>{busy ? "Starting…" : "Start run"}</button></div>{message && <p className="message">{message}</p>}</form></section><section className="panel"><div className="panel-head"><h2 className="panel-title">At a glance</h2><span className="panel-note">This workspace</span></div><div className="metric-grid"><div className="metric"><b>{runs.length}</b><span>Total runs</span></div><div className="metric"><b>{completed}</b><span>Completed</span></div><div className="metric"><b>{active}</b><span>In progress</span></div><div className="metric"><b>{failed}</b><span>Failed</span></div></div></section></main>
+          <section className="panel runs" id="runs"><div className="panel-head"><h2 className="panel-title">Your runs</h2><span className="panel-note">{runs.length} saved</span></div><div className="run-toolbar">{["all","running","queued","succeeded","failed"].map(value => <button type="button" key={value} className={"filter " + (filter === value ? "active" : "")} onClick={() => setFilter(value)}>{value}</button>)}</div>{visibleRuns.length ? <div className="run-grid">{visibleRuns.map(run => <article className="run-card" key={run.id} onClick={() => openRun(run.id)} role="button" tabIndex="0" onKeyDown={e=>e.key==="Enter" && openRun(run.id)}><div className="run-card-head"><div><div className="run-name">{run.name}</div><div className="run-id">{String(run.tracking_id).slice(0, 14)}…</div></div><span className={"pill " + run.status}>{run.status}</span></div><div className="stage"><span>{stageName(run)}</span><div className="stage-line"><i style={{width: stageProgress(run) + "%"}} /></div><span>{stageProgress(run)}%</span></div><span className="run-time">{formatDate(run.updated_at)}</span></article>)}</div> : <div className="empty">{runs.length ? "No runs match this filter." : "Your workspace is ready. Start your first run above."}</div>}</section>
+          {selected && <div className="detail-backdrop" onClick={e=>e.target===e.currentTarget && setSelected(null)}><section className="detail"><div className="detail-head"><div><div className="eyebrow">{selected.status}</div><h2 className="panel-title">{selected.name}</h2></div><div style={{display:"flex",gap:"10px",alignItems:"center"}}><button type="button" className="btn-delete" onClick={()=>deleteRun(selected.id)}>Delete run</button><button className="close" onClick={()=>setSelected(null)} aria-label="Close details">×</button></div></div><div className="detail-body"><p className="message">{selected.current_stage} · {selected.progress}% complete</p><div className="detail-grid"><div className="detail-stat"><b>{selected.result?.validation?.row_count || 0}</b><span>Rows</span></div><div className="detail-stat"><b>{selected.result?.evaluation?.score ?? "N/A"}</b><span>Score</span></div><div className="detail-stat"><b>{selected.stage_history.length}</b><span>Stages</span></div></div>{selected.error && <p className="message error">{selected.error}</p>}{selected.result && <pre>{JSON.stringify(selected.result, null, 2)}</pre>}</div></section></div>}
+          <footer className="footer"><span>FlowOps / From command to model evaluation</span><span>Built for the curious</span></footer>
+        </div>;
+      }
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

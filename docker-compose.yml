@@ -1,0 +1,12 @@
+services:
+  api:
+    build: .
+    ports: ["8000:8000"]
+    environment:
+      FLOWOPS_AWS_ENDPOINT_URL: http://localstack:4566
+    depends_on: [localstack]
+  localstack:
+    image: localstack/localstack:3
+    ports: ["4566:4566"]
+    environment: [SERVICES=s3,dynamodb,DEBUG=0]
+    volumes: ["./scripts:/etc/localstack/init/ready.d"]
