@@ -6,13 +6,16 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
+# Upgrade pip and install uv for fast and reliable dependency resolution
 RUN pip install --no-cache-dir --upgrade pip uv
 
-COPY pyproject.toml .
-RUN uv pip install --system --no-cache .
-
+# Copy project files into container
 COPY . .
 
+# Install FlowOps package and dependencies
+RUN uv pip install --system --no-cache .
+
+# Create non-root user for security
 RUN useradd -u 1000 appuser && chown -R appuser:appuser /app
 USER appuser
 
