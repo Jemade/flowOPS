@@ -2,6 +2,10 @@
 
 FlowOps is a lightweight data pipeline orchestration engine and dashboard built with Python, FastAPI, and LangGraph. It provides a simple way to submit, execute, track, and evaluate data processing workflows with support for local file storage, Amazon S3, and DynamoDB.
 
+- Live Application: https://flowops-k1yz.onrender.com
+- API Documentation: https://flowops-k1yz.onrender.com/docs
+- Health Status: https://flowops-k1yz.onrender.com/health
+
 This document covers the system architecture, component breakdown, local setup instructions, containerization with Docker, and production deployment on Kubernetes.
 
 ---
