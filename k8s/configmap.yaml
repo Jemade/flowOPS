@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flowops-config
+  namespace: flowops
+data:
+  FLOWOPS_AWS_REGION: "us-east-1"
+  FLOWOPS_S3_BUCKET: "flowops-data"
+  FLOWOPS_DYNAMODB_TABLE: "flowops-pipelines"
+  FLOWOPS_DEMO_FIXTURE: "demo.csv"

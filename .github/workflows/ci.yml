@@ -1,0 +1,56 @@
+name: CI and Docker Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install uv and dependencies
+        run: |
+          pip install --upgrade pip uv
+          uv pip install --system -e ".[dev]"
+
+      - name: Run pytest
+        run: |
+          pytest -v
+
+  build-and-package:
+    name: Build Docker Image
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: flowops:test
+
+      - name: Verify image starts and passes health check
+        run: |
+          docker run -d --name flowops-test -p 8000:8000 flowops:test
+          sleep 5
+          curl -f http://localhost:8000/health || exit 1
+          docker stop flowops-test

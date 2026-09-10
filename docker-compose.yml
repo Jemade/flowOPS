@@ -1,12 +1,29 @@
 services:
   api:
     build: .
-    ports: ["8000:8000"]
+    image: flowops:latest
+    ports:
+      - "8000:8000"
     environment:
-      FLOWOPS_AWS_ENDPOINT_URL: http://localstack:4566
-    depends_on: [localstack]
+      - FLOWOPS_AWS_ENDPOINT_URL=http://localstack:4566
+      - FLOWOPS_AWS_REGION=us-east-1
+      - FLOWOPS_S3_BUCKET=flowops-data
+      - FLOWOPS_DYNAMODB_TABLE=flowops-pipelines
+    depends_on:
+      localstack:
+        condition: service_healthy
+
   localstack:
     image: localstack/localstack:3
-    ports: ["4566:4566"]
-    environment: [SERVICES=s3,dynamodb,DEBUG=0]
-    volumes: ["./scripts:/etc/localstack/init/ready.d"]
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3,dynamodb
+      - DEBUG=0
+    volumes:
+      - "./scripts:/etc/localstack/init/ready.d"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
