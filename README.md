@@ -46,3 +46,9 @@ Compose includes LocalStack on port 4566. Configure AWS credentials and resource
 ## Current scope
 
 Pipeline execution runs in the API process through asynchronous tasks. It is not a durable distributed job queue. In-memory state and metrics do not survive a restart; configured external storage has separate persistence.
+
+## Engineering and contribution guide
+
+Read the [engineering notes](docs/ENGINEERING.md) for implementation boundaries and verification commands, the [review checklist](docs/REVIEW_CHECKLIST.md) for evidence still required, and [CONTRIBUTING.md](CONTRIBUTING.md) to propose changes. Report vulnerabilities through [SECURITY.md](SECURITY.md).
+
+[![Repository hygiene](https://github.com/Jemade/flowOPS/actions/workflows/repository-hygiene.yml/badge.svg)](https://github.com/Jemade/flowOPS/actions/workflows/repository-hygiene.yml)
