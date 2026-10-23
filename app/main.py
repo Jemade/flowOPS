@@ -84,14 +84,14 @@ async def run_pipeline(pid: UUID, request: PipelineRequest) -> None:
         )
         metrics["pipelines_succeeded"] += 1
 
-    except Exception as exc:
+    except Exception:
         # Record failure and log the traceback
         logger.exception("Pipeline execution failed", extra={"pipeline_id": str(pid)})
         await store.update(
             pid,
             status=PipelineStatus.failed,
             current_stage="failed",
-            error=str(exc),
+            error="Pipeline execution failed. Check server logs for details.",
         )
         metrics["pipelines_failed"] += 1
 
